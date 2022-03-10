@@ -38,3 +38,5 @@ Mithrakumar, M. (2019, November 12). How to tune a Decision Tree? - Towards Data
 Brownlee, J. (2020a, August 15). How to Configure the Gradient Boosting Algorithm. Machine Learning Mastery. https://machinelearningmastery.com/configure-gradient-boosting-algorithm/
 
 Raj, A. (2021, October 30). An Exhaustive Guide to Decision Tree Classification in Python 3.x. Medium. https://towardsdatascience.com/an-exhaustive-guide-to-classification-using-decision-trees-8d472e77223f
+
+Aruchamy, V. (2021, December 15). How To Plot Confusion Matrix In Python And Why You Need To? Stack Vidhya. https://www.stackvidhya.com/plot-confusion-matrix-in-python-and-why/

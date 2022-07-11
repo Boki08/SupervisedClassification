@@ -36,7 +36,6 @@ class Data:
 
         self.test_copy_full = self.test_data.copy()
         self.test_copy = self.test_data.copy()
-        self.val_copy = 0
 
         self.y_train_full = 0
         self.x_test_copy = 0
@@ -109,19 +108,19 @@ class Data:
         if type_of_split == "Train":
             self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x_train_copy,
                                                                                     self.y_train_full,
-                                                                                    test_size=0.4, random_state=0)
+                                                                                    test_size=0.4, random_state=None)
             self.x_test, self.x_val, self.y_test, self.y_val = train_test_split(self.x_test,
                                                                                 self.y_test,
-                                                                                test_size=0.5, random_state=0)
-            self.val_copy = self.x_val
-            self.val_copy = self.train_copy.loc[self.x_val.index.tolist()]
+                                                                                test_size=0.5, random_state=None)
+
+            self.test_copy = self.train_copy.loc[self.x_test.index.tolist()]
 
             sc = StandardScaler()
             self.x_train = sc.fit_transform(self.x_train)
             self.x_test = sc.transform(self.x_test)
             self.x_val = sc.transform(self.x_val)
 
-            print("\tData shape set to train")
+            print("\n\tData shape set to train")
             print("\tx_train: {:s}, y_train:{:s}".format('{}'.format(self.x_train.shape),
                                                          '{}'.format(self.y_train.shape)))
             print("\tx_test: {:s}, y_test:{:s}".format('{}'.format(self.x_test.shape), '{}'.format(self.y_test.shape)))

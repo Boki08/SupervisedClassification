@@ -17,7 +17,7 @@ class Model:
         self.loaded = False
         self.model_name = ""
 
-    def evaluation(self, type_of_split, x_train, y_train, x_test, y_test):
+    def evaluation(self, type_of_split, x_train, y_train, x_val, y_val):
 
         # Tree summary and model evaluation metrics
         print('* {:s} *'.format(self.model_name).center(55))
@@ -40,7 +40,7 @@ class Model:
                             val[...] = 0
                         else:
                             val[...] = 1
-            pred_labels_test = self.model.predict(x_test)
+            pred_labels_test = self.model.predict(x_val)
             with np.nditer(pred_labels_test, op_flags=['readwrite']) as it:
                 for val in it:
                     if val != 0 and val != 1:
@@ -50,10 +50,10 @@ class Model:
                             val[...] = 1
 
             print('* {:s} *'.format(self.model_name).center(55))
-            print('*************** Evaluation on Test Data ****************')
-            score_te = self.model.score(x_test, y_test)
+            print('*************** Evaluation on Validation Data ****************')
+            score_te = self.model.score(x_val, y_val)
             print('Accuracy Score: ', score_te)
-            print(classification_report(y_test, pred_labels_test))
+            print(classification_report(y_val, pred_labels_test))
             print('--------------------------------------------------------\n')
 
             print('* {:s} *'.format(self.model_name).center(55))
@@ -63,17 +63,19 @@ class Model:
             print(classification_report(y_train, pred_labels_train))
             print('--------------------------------------------------------\n')
 
-            cf_matrix = confusion_matrix(y_test, pred_labels_test)
+            cf_matrix = confusion_matrix(y_val, pred_labels_test)
             print('* {:s} *'.format(self.model_name).center(55))
             print('******************* Confusion matrix *******************')
             print(cf_matrix)
             print('--------------------------------------------------------\n')
 
-            print_confusion_matrix(cf_matrix, '{:s} (Test Data)'.format(self.model_name))
+            print_confusion_matrix(cf_matrix, '{:s} (Validation Data)'.format(self.model_name))
 
     def create_random_forest(self, data):
         # self.model = RandomForestClassifier(n_jobs=2, max_features='sqrt', min_samples_leaf=3, min_samples_split=25,
         #                                     n_estimators=4, max_depth=5)
+        # self.model = RandomForestClassifier(n_jobs=2, max_features='log2', min_samples_leaf=2, min_samples_split=2,
+        #                                     n_estimators=164, max_depth=4)
         self.model = RandomForestClassifier(n_jobs=2, max_features='log2', min_samples_leaf=2, min_samples_split=58,
                                             n_estimators=164, max_depth=4)
         self.model.fit(data.x_train, data.y_train)
@@ -82,7 +84,7 @@ class Model:
         self.loaded = True
 
         features_importance(self.model.feature_importances_, data.columns, self.model_name)
-        self.evaluation(data.type_of_split, data.x_train, data.y_train, data.x_test, data.y_test)
+        self.evaluation(data.type_of_split, data.x_train, data.y_train, data.x_val, data.y_val)
 
         pickle.dump(self.model, open(self.model_name, 'wb'))
 
@@ -93,6 +95,9 @@ class Model:
         self.model = GradientBoostingClassifier(learning_rate=0.105097, max_features='log2', loss='deviance',
                                                 min_samples_leaf=17, min_samples_split=47, n_estimators=907,
                                                 max_depth=4)
+        # self.model = GradientBoostingClassifier(learning_rate=0.1, max_features='log2', loss='deviance',
+        #                                         min_samples_leaf=1, min_samples_split=2, n_estimators=5,
+        #                                         max_depth=3)
 
         self.model.fit(data.x_train, data.y_train)
         self.model_name = "GradientBoosting"
@@ -100,7 +105,7 @@ class Model:
         self.loaded = True
 
         features_importance(self.model.feature_importances_, data.columns, self.model_name)
-        self.evaluation(data.type_of_split, data.x_train, data.y_train, data.x_test, data.y_test)
+        self.evaluation(data.type_of_split, data.x_train, data.y_train, data.x_val, data.y_val)
 
         pickle.dump(self.model, open(self.model_name, 'wb'))
 
@@ -116,7 +121,7 @@ class Model:
         self.loaded = True
 
         features_importance(model.feature_importances_, data.columns, self.model_name)
-        self.evaluation(data.type_of_split, data.x_train, data.y_train, data.x_test, data.y_test)
+        self.evaluation(data.type_of_split, data.x_train, data.y_train, data.x_val, data.y_val)
 
         pickle.dump(self.model, open(self.model_name, 'wb'))
 
@@ -218,13 +223,13 @@ class Model:
         preds.to_csv("Predictions{:s}_Regular.csv".format(self.model_name), float_format="%.8f")
         print('Done\n')
 
-    def simulate_val(self, x_val, y_val, val_copy):  # validation split
+    def simulate_val(self, x_test, y_test, test_copy):  # validation split
 
         print("\tUsing {:s}\n".format(self.model_name))
 
-        x_pred = self.model.predict(x_val)
+        x_pred = self.model.predict(x_test)
 
-        preds = val_copy.copy()
+        preds = test_copy.copy()
         preds = preds.assign(Predictions=x_pred, PredictionValues=x_pred)
 
         preds_val_temp = x_pred
@@ -235,14 +240,14 @@ class Model:
                         val[...] = 0
                     else:
                         val[...] = 1
-        print("Accuracy: {:.4f}%".format(accuracy_score(preds_val_temp, y_val)))
+        print("Accuracy: {:.4f}%".format(accuracy_score(preds_val_temp, y_test)))
 
-        cf_matrix = confusion_matrix(y_val, x_pred)
+        cf_matrix = confusion_matrix(y_test, x_pred)
         print('******************* Confusion matrix *******************')
         print(cf_matrix)
         print('--------------------------------------------------------\n')
 
-        print_confusion_matrix(cf_matrix, '{:s} (Validation Data)'.format(self.model_name))
+        print_confusion_matrix(cf_matrix, '{:s} (Test Data)'.format(self.model_name))
 
         preds.reset_index(drop=True, inplace=True)
 
@@ -270,7 +275,7 @@ class Model:
         f1_score = 2 * (precision * sensitivity) / (precision + sensitivity)
 
         print('* {:s} *'.format(self.model_name).center(55))
-        print('**************** Evaluation on Validation Data ****************')
+        print('**************** Evaluation on Test Data ****************')
         print("All: {:d}, correct: {:d} ({:.4f}%), incorrect: {:d} ({:.4f}%)\nTesting Accuracy: {:.4f}\nSensitivity("
               "Recall): {:.4f}\nPrecision: {:.4f}\nF1-Score: {:.4f}".format
               ((correct + incorrect), correct, correct_percent, incorrect, (100 - correct_percent), accuracy,
@@ -278,7 +283,7 @@ class Model:
         print('---------------------------------------------------------------\n')
 
         print('Writing to a file...')
-        preds.to_csv("Predictions{:s}_Validation.csv".format(self.model_name), float_format="%.8f")
+        preds.to_csv("Predictions{:s}_Test.csv".format(self.model_name), float_format="%.8f")
         print('Done\n')
 
 

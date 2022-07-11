@@ -7,7 +7,7 @@ if __name__ == '__main__':
     train_file = 'FullTrain.csv'
 
     test_file = 'test.csv'
-    # test_file = 'test.csv'
+    #testFile = '20191206MixTest.csv'
 
     data_obj = data.Data(train_file, test_file)
 
@@ -107,7 +107,7 @@ if __name__ == '__main__':
             if model_obj.loaded:
                 if data_obj.type_of_split == "Train":
                     print("Simulate on Validation Data")
-                    model_obj.simulate_val(data_obj.x_val, data_obj.y_val, data_obj.val_copy)
+                    model_obj.simulate_val(data_obj.x_test, data_obj.y_test, data_obj.test_copy)
                 else:
                     print("Simulate on Test Data")
                     model_obj.simulate(data_obj.x_test, data_obj.test_copy)

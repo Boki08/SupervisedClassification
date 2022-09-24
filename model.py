@@ -72,10 +72,7 @@ class Model:
             print_confusion_matrix(cf_matrix, '{:s} (Validation Data)'.format(self.model_name))
 
     def create_random_forest(self, data):
-        # self.model = RandomForestClassifier(n_jobs=2, max_features='sqrt', min_samples_leaf=3, min_samples_split=25,
-        #                                     n_estimators=4, max_depth=5)
-        # self.model = RandomForestClassifier(n_jobs=2, max_features='log2', min_samples_leaf=2, min_samples_split=2,
-        #                                     n_estimators=164, max_depth=4)
+
         self.model = RandomForestClassifier(n_jobs=2, max_features='log2', min_samples_leaf=2, min_samples_split=58,
                                             n_estimators=164, max_depth=4)
         self.model.fit(data.x_train, data.y_train)
@@ -95,9 +92,6 @@ class Model:
         self.model = GradientBoostingClassifier(learning_rate=0.105097, max_features='log2', loss='deviance',
                                                 min_samples_leaf=17, min_samples_split=47, n_estimators=907,
                                                 max_depth=4)
-        # self.model = GradientBoostingClassifier(learning_rate=0.1, max_features='log2', loss='deviance',
-        #                                         min_samples_leaf=1, min_samples_split=2, n_estimators=5,
-        #                                         max_depth=3)
 
         self.model.fit(data.x_train, data.y_train)
         self.model_name = "GradientBoosting"
